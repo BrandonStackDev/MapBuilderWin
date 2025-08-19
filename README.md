@@ -12,16 +12,18 @@ To run this with Visual Studio
 	- for each exe (create and play) Add Debug Configuration
 	- Will need to add to each section
 		- "currentDir": "${workspaceRoot}"
-		- [![DEBUG_CONFIG](z_DebugConfig.png)](z_DebugConfig.png)
+		- [![DEBUG_CONFIG](readme_assets/z_DebugConfig.png)](readme_assets/z_DebugConfig.png)
 
 
 
 --------------------------------------------------------------------------------------------------------
-[![DeadTrees](z_deadTrees.png)](z_deadTrees.png)
-[![Day](z_nice_day.png)](z_nice_day.png)
-[![Night](z_nice_night.png)](z_nice_night.png)
-[![Truck](z_truck.png)](z_truck.png)
---------------------------------------------------------------------------------------------------------
+[![DeadTrees](readme_assets/z_deadTrees.png)](readme_assets/z_deadTrees.png)
+
+[![Day](readme_assets/z_nice_day.png)](readme_assets/z_nice_day.png)
+
+[![Night](readme_assets/z_nice_night.png)](readme_assets/z_nice_night.png)
+
+[![Truck](readme_assets/z_truck.png)](readme_assets/z_truck.png)
 
 
 
