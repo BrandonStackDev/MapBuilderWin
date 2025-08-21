@@ -7,6 +7,7 @@
 #include "rlights.h"
 //me
 #include "models.h"
+#include "whale.h"
 //fairly standard things
 #include <float.h>
 #include <stdio.h>
@@ -92,6 +93,7 @@ typedef enum {
 #define MAX_WATER_PATCHES_PER_CHUNK 64
 #define WATER_Y_OFFSET 19.15f //lets get wet!
 #define PLAYER_FLOAT_Y_POSITION 298.75f 
+#define WHALE_SURFACE 300.0f 
 
 
 //movement
@@ -907,21 +909,6 @@ Star *GenerateStars(int count)
         float z = sinf(angle) * dist;
         stars[i].pos = (Vector3){ x, GetRandomValue(1800, 2400), z }; // you'll set .y later
     }
-    // for (int i = 0; i < STAR_COUNT; i++) //sphere
-    // {
-    //     float theta = GetRandomValue(0, 360) * DEG2RAD;
-    //     float phi = acosf(GetRandomValue(-1000, 1000) / 1000.0f);  // uniform sphere
-
-    //     float radius = 1000.0f; // or whatever looks good
-
-    //     stars[i].pos.x = radius * sinf(phi) * cosf(theta);
-    //     stars[i].pos.y = (200 * cosf(phi)) + 1600;
-    //     stars[i].pos.z = radius * sinf(phi) * sinf(theta);
-
-    //     // Matrix mat = MatrixTranslate(stars[i].pos.x, stars[i].pos.y, stars[i].pos.z);
-    //     // mat.m12 = (float)i;  // unique instance ID
-    //     // starTransforms[i] = mat;
-    // }
     return stars;
 }
 
@@ -1569,7 +1556,7 @@ int main(void) {
     float friction = 0.96f;//I dont want this to fight too much with rolling down hills
     const float spinRate = 720.0f; // degrees per unit of speed, tweak as needed
     Truck_Air_State truckAirState = GROUND;
-    //sliding truck when moving fast and tturning too hard
+    //sliding truck when moving fast and turning too hard
     bool isTruckSliding = false;
     bool truckSlidePeek = false;
     Vector3 truckSlideForward = { 0.0f, 0.0f, 0.0f }; //well set this bycorrectly rotating forward
@@ -1630,6 +1617,26 @@ int main(void) {
     InitAudioDevice();
     //DisableCursor();
     SetTargetFPS(60);
+    ////whales---------------------------------------------------
+    int numWhales = 5; // five whales right now
+    Whale* whales = (Whale*)malloc(sizeof(Whale) * numWhales);
+    //init whale struct
+    whales[0] = (Whale){ 0 };
+    InitWhale(&whales[0], (Vector3) { 1513, 180, 4951 }, 120, WHALE_SURFACE);
+    if (!LoadWhale(&whales[0])) { return 1; }
+    whales[1] = (Whale){ 0 };
+    InitWhale(&whales[1], (Vector3) { -4498, 100, 6150 }, 20, WHALE_SURFACE);
+    if (!LoadWhale(&whales[1])) { return 1; }
+    whales[2] = (Whale){ 0 };
+    InitWhale(&whales[2], (Vector3) { 6000, 100, 6000 }, 20, WHALE_SURFACE);
+    if (!LoadWhale(&whales[2])) { return 1; }
+    whales[3] = (Whale){ 0 };
+    InitWhale(&whales[3], (Vector3) { -6000, 80, -6000 }, 20, WHALE_SURFACE);
+    if (!LoadWhale(&whales[3])) { return 1; }
+    whales[4] = (Whale){ 0 };
+    InitWhale(&whales[4], (Vector3) { 6000, 56, -6000 }, 10, WHALE_SURFACE);
+    if (!LoadWhale(&whales[4])) { return 1; }
+    ////end whales setup-----------------------------------------
     //shaders  
         // - 
     Shader heightShaderLight = LoadShader("shaders/120/height_color_lighting.vs", "shaders/120/height_color_lighting.fs");
@@ -2625,6 +2632,21 @@ int main(void) {
             rotationTruck.m12 = truckOrigin.x;
             rotationTruck.m13 = Lerp(truckOrigin.y + truckYOffsetDraw, truckOrigin.y + truckYOffsetDraw + truckPitchYOffset, 0.01f); //!!!!SPACE TRUCK!!!!
             rotationTruck.m14 = truckOrigin.z;
+            //whales
+            if (onLoad)
+            {
+                for (int i = 0; i < numWhales; i++)
+                {
+                    FSM_Tick(&whales[i], (float)GetTime(), GetFrameTime());
+                    Quaternion qFinal = BuildWorldQuat(&whales[i]);
+                    Matrix R = QuaternionToMatrix(qFinal);
+                    Matrix T = MatrixTranslate(whales[i].pos.x, whales[i].pos.y, whales[i].pos.z);
+                    Matrix S = MatrixScale(10, 10, 10);
+                    Matrix whaleXform = MatrixMultiply(S, MatrixMultiply(R,T));
+                    DrawMesh(whales[i].model.meshes[0], whales[i].model.materials[0], whaleXform);
+                    //DrawSphere(whales[i].pos, 4.0f, RED);
+                }
+            }
             if (onLoad && truck.meshCount > 0)
             {
                 if (displayTruckPoints)
