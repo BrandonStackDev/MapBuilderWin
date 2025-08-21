@@ -25,6 +25,14 @@ To run this with Visual Studio
 
 [![Truck](readme_assets/z_truck.png)](readme_assets/z_truck.png)
 
+--------------------------------------------------------------------------------------------------------
+
+Whales!
+
+[![WhaleTail](readme_assets/whale_01.png)](readme_assets/whale_01.png)
+
+[![WhaleOfAGoodTime](readme_assets/whale_02.png)](readme_assets/whale_02.png)
+
 
 
 
