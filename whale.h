@@ -7,12 +7,12 @@
 
 //bones in the whale indexes
 typedef enum {
-    WHALE_BONE_TAIL = 0,  // pick a new goal near home
-    WHALE_BONE_AB,    // swim gently toward goal (tail up/down)
-    WHALE_BONE_CHEST,      // barrel roll a few spins, then re-plan
-    WHALE_BONE_HEAD,      // quick yaw + pitch-down pulse
-    WHALE_BONE_MOUTH,      // descend to bottomY
-    WHALE_BONE_LEFTFIN,          // accelerate up to surfaceY, roll to back, then re-plan
+    WHALE_BONE_TAIL = 0,  
+    WHALE_BONE_AB,    
+    WHALE_BONE_CHEST,     
+    WHALE_BONE_HEAD,     
+    WHALE_BONE_MOUTH,     
+    WHALE_BONE_LEFTFIN,     
     WHALE_BONE_RIGHTFIN,
 } WhaleBones;
 // --------- States ----------
@@ -147,10 +147,10 @@ static void InitWhale(Whale* A, Vector3 home, float bottomY, float surfaceY) {
 
     // Tunable params
     A->home = home;
-    A->homeRadius = 14.0f;
+    A->homeRadius = 88.88f;
     A->arriveRadius = 3.21f;
-    A->bottomY = bottomY;     // “floor” (settable)
-    A->surfaceY = surfaceY;    // “surface” (settable)
+    A->bottomY = bottomY;     // floor
+    A->surfaceY = surfaceY;    // surface
 
     A->goal = A->home;
     A->state = SWIM_PLAN;
@@ -215,7 +215,6 @@ static void ApplyCruiseBones(Whale* A, float t) {
     SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_TAIL, DEG2RAD * 10.0f * s2, 0, 0);
     SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_AB, DEG2RAD * 4.0f * s2, 0, 0);
     SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_CHEST, DEG2RAD * 2.0f * s2, 0, 0);
-    SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_HEAD, DEG2RAD * 1.0f * s2, 0, 0);
     SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_LEFTFIN, 0, 0, DEG2RAD * 5.0f * s3);
     SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_RIGHTFIN, 0, 0, -DEG2RAD * 5.0f * s3);
 }
@@ -230,14 +229,8 @@ static void ApplyBreachBones(Whale* A, float t, float tailDeg) {
     SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_TAIL, DEG2RAD * tailDeg * s3, 0, 0);
     SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_AB, DEG2RAD * (tailDeg * 0.5f) * s3, 0, 0);
     SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_CHEST, DEG2RAD * (tailDeg * 0.25f) * s3, 0, 0);
-    SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_HEAD, DEG2RAD * 0.78f * s3, 0, 0);
     SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_LEFTFIN, 0, 0, DEG2RAD * 5.0f * s3);
     SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_RIGHTFIN, 0, 0, -DEG2RAD * 5.0f * s3);
-}
-static void ApplyTailSlapBones(Whale* A, float t, float tailDeg) {
-    float s3 = sinf(t * 3.0f);
-    SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_TAIL, DEG2RAD * tailDeg * s3, 0, 0);
-    SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_AB, DEG2RAD * (tailDeg * 0.5f) * s3, 0, 0);
 }
 
 // Pick a new far-ish horizontal goal around home
@@ -245,7 +238,10 @@ static Vector3 PickGoalAroundHome(Whale* A) {
     float ang = Frand(0.0f, 2.0f * PI);
     float r = Frand(A->homeRadius * 0.4f, A->homeRadius);
     float gy = Frand(A->home.y - 1.0f, A->home.y + 1.0f);
-    return (Vector3) { A->home.x + r * cosf(ang), gy, A->home.z + r * sinf(ang) };
+    Vector3 res = { A->home.x + r * cosf(ang), gy, A->home.z + r * sinf(ang) };
+    if (res.y > A->surfaceY) { res.y = A->surfaceY; }
+    if (res.y < A->bottomY) { res.y = A->bottomY; }
+    return res;
 }
 
 // Decide next after Cruise (equal chance)
@@ -429,16 +425,14 @@ static void FSM_Tick(Whale* A, float t, float dt) {
         float s = A->stateTime / 1.2f;
         float rate = 16.0f * dt;
         A->pitch += rate;
-        SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_AB, DEG2RAD * (-6.0f * s), 0, 0);
-        SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_CHEST, DEG2RAD * (-4.0f * s), 0, 0);
         SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_TAIL, DEG2RAD * (-8.0f * s), 0, 0);
-
-        // NEW: slow forward glide along heading (+Z in model space is forward)
-        const float glideSpeed = 0.58f;                         // tune: 0.6–1.2 feels right
+        SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_AB, DEG2RAD * (-6.0f * s), 0, 0);
+        //SetFromBindPlusEuler(&A->model, &A->proc, WHALE_BONE_CHEST, DEG2RAD * (-4.0f * s), 0, 0);
+        // slow forward glide along heading (+Z in model space is forward)
+        const float glideSpeed = 8.2f;// tune
         Vector3 fwd = (Vector3){ sinf(DEG2RAD * A->yaw), 0.0f, cosf(DEG2RAD * A->yaw) };
         A->pos = Vector3Add(A->pos, Vector3Scale(fwd, glideSpeed * dt));
-
-        // NEW: gently keep the body near the surface while gliding
+        // gently keep the body near the surface while gliding
         A->pos.y = Lerp(A->pos.y, A->surfaceY - 0.6f, 0.04f); // lower = more “skimming”
 
         if (A->stateTime > 6.2f) { EnterState(A, SWIM_PLAN); }

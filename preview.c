@@ -1622,19 +1622,19 @@ int main(void) {
     Whale* whales = (Whale*)malloc(sizeof(Whale) * numWhales);
     //init whale struct
     whales[0] = (Whale){ 0 };
-    InitWhale(&whales[0], (Vector3) { 1513, 180, 4951 }, 120, WHALE_SURFACE);
+    InitWhale(&whales[0], (Vector3) { 1513, 245, 4951 }, 205, WHALE_SURFACE);
     if (!LoadWhale(&whales[0])) { return 1; }
     whales[1] = (Whale){ 0 };
-    InitWhale(&whales[1], (Vector3) { -4498, 100, 6150 }, 20, WHALE_SURFACE);
+    InitWhale(&whales[1], (Vector3) { -4498, 150, 6150 }, 50, WHALE_SURFACE);
     if (!LoadWhale(&whales[1])) { return 1; }
     whales[2] = (Whale){ 0 };
-    InitWhale(&whales[2], (Vector3) { 6000, 100, 6000 }, 20, WHALE_SURFACE);
+    InitWhale(&whales[2], (Vector3) { 6000, 150, 6000 }, 50, WHALE_SURFACE);
     if (!LoadWhale(&whales[2])) { return 1; }
     whales[3] = (Whale){ 0 };
-    InitWhale(&whales[3], (Vector3) { -6000, 80, -6000 }, 20, WHALE_SURFACE);
+    InitWhale(&whales[3], (Vector3) { -6000, 80, -6000 }, 50, WHALE_SURFACE);
     if (!LoadWhale(&whales[3])) { return 1; }
     whales[4] = (Whale){ 0 };
-    InitWhale(&whales[4], (Vector3) { 6000, 56, -6000 }, 10, WHALE_SURFACE);
+    InitWhale(&whales[4], (Vector3) { 6000, 130, -6000 }, 50, WHALE_SURFACE);
     if (!LoadWhale(&whales[4])) { return 1; }
     ////end whales setup-----------------------------------------
     //shaders  
